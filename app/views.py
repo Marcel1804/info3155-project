@@ -8,7 +8,7 @@ This file creates your application.
 from app import app, db, login_manager
 from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, current_user, login_required
-from forms import LoginForm
+from forms import LoginForm, SignupForm
 from models import UserProfile
 from werkzeug.security import check_password_hash
 
@@ -35,10 +35,42 @@ def secure_page():
     """Render a secure page on our website that only logged in users can access."""
     return render_template('secure_page.html')
     
-@app.route('/signup-page')
+@app.route('/signup-page',methods=['GET','POST'])
 def signup_page():
     """Render a secure page on our website that only logged in users can access."""
-    return render_template('signup_page.html')
+    if current_user.is_authenticated:
+         # if user is already logged in, just redirect them to our secure page
+        # or some other page like a dashboard
+        return redirect(url_for('secure_page'))
+    
+    form=SignupForm()
+     # Signup and validate the user.
+    if request.method == 'POST' and form.validate_on_submit():
+        # Query our database to see if the username and password entered
+        # match a user that is in the database.
+        username = form.username.data
+        firstname = form.firstname.data
+        lastname=form.lastname.data
+        password = form.password.data
+        confirmpassword = form.confirmpassword.data
+
+        # user = UserProfile.query.filter_by(username=username, password=password)\
+        # .first()
+        # or
+        user = UserProfile.query.filter_by(username=username).first()
+
+        if user is not None :
+
+            #todo add user to database
+            flash('Sign-up was successfully.', 'success')
+
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('home'))
+        else:
+            flash('Username or Password is incorrect.', 'danger')
+
+    flash_errors(form)
+    return render_template('signup_page.html',form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
