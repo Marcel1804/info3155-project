@@ -1,4 +1,4 @@
-# Demo User App
+# Demonstration website security
 This demo app demonstrates the use of Flask-Login for a simple login system for a Flask application.
 
 ## Setup
