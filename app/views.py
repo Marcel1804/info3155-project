@@ -35,6 +35,12 @@ def secure_page():
     """Render a secure page on our website that only logged in users can access."""
     return render_template('secure_page.html')
     
+@app.route('/profile-page')
+@login_required
+def profile_page():
+    """Render a secure page on our website that only logged in users can access."""
+    return render_template('profile_page.html')
+    
 @app.route('/signup-page',methods=['GET','POST'])
 def signup_page():
     """Render a secure page on our website that only logged in users can access."""
@@ -58,19 +64,29 @@ def signup_page():
         # .first()
         # or
         user = UserProfile.query.filter_by(username=username).first()
-
-        if user is not None :
+        
+        if user is None :
 
             #todo add user to database
-            flash('Sign-up was successfully.', 'success')
+            if password == confirmpassword:
+                user=UserProfile(first_name=firstname,last_name=lastname,username=username,password=password)
+                db.session.add(user)
+                db.session.commit()
+                flash('Sign-up was successfully.', 'success')
 
-            next_page = request.args.get('next')
-            return redirect(next_page or url_for('home'))
-        else:
-            flash('Username or Password is incorrect.', 'danger')
-
+                next_page = request.args.get('next')
+                return redirect(next_page or url_for('home'))
+            else:
+                flash("Password and Confirmpassword don't match", 'danger')
+                
+        elif user is not None:
+             flash("already a member", 'danger')
+             return redirect(url_for('login'))
+             
     flash_errors(form)
     return render_template('signup_page.html',form=form)
+
+    
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -78,7 +94,7 @@ def login():
     if current_user.is_authenticated:
         # if user is already logged in, just redirect them to our secure page
         # or some other page like a dashboard
-        return redirect(url_for('secure_page'))
+         return redirect(url_for('secure_page'))
 
     # Here we use a class of some kind to represent and validate our
     # client-side form data. For example, WTForms is a library that will
@@ -110,7 +126,7 @@ def login():
             flash('Logged in successfully.', 'success')
 
             next_page = request.args.get('next')
-            return redirect(next_page or url_for('home'))
+            return redirect(next_page or url_for('profile_page'))
         else:
             flash('Username or Password is incorrect.', 'danger')
 
