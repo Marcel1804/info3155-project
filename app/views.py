@@ -41,6 +41,12 @@ def profile_page():
     """Render a secure page on our website that only logged in users can access."""
     return render_template('profile_page.html')
     
+@app.route('/admin')
+@login_required
+def admin():
+    """Render a secure page on our website that only logged in users can access."""
+    return render_template('admin.html')
+    
 @app.route('/signup-page',methods=['GET','POST'])
 def signup_page():
     """Render a secure page on our website that only logged in users can access."""
@@ -75,6 +81,7 @@ def signup_page():
                 flash('Sign-up was successfully.', 'success')
 
                 next_page = request.args.get('next')
+                login_user(user)
                 return redirect(next_page or url_for('home'))
             else:
                 flash("Password and Confirmpassword don't match", 'danger')
@@ -86,7 +93,6 @@ def signup_page():
     flash_errors(form)
     return render_template('signup_page.html',form=form)
 
-    
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -115,7 +121,7 @@ def login():
         if user is not None and check_password_hash(user.password, password):
             remember_me = False
 
-            if 'remember_me' in request.form:
+            if 'remember_me' in request.form and username!="admin" :
                 remember_me = True
 
             # If the user is not blank, meaning if a user was actually found,
@@ -127,6 +133,10 @@ def login():
 
             next_page = request.args.get('next')
             return redirect(next_page or url_for('profile_page'))
+            
+            if  username=="admin":
+                flash('Logged in successfully.', 'success')
+                return redirect(url_for('admin'))
         else:
             flash('Username or Password is incorrect.', 'danger')
 
