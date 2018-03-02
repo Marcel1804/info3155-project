@@ -24,3 +24,51 @@ footer {
 .center {
   text-align: center;
 }
+.visit{
+   visibility: hidden;
+}
+h6{
+   font-style: italic;
+   text-decoration: underline;
+}
+
+.colour{
+    background-color: green;
+}
+div.colour{
+    color: white;
+}
+.info{
+    color: gray;
+}
+.center{
+         text-align: center;
+}
+div.center{
+         padding-right: 10px;
+}
+.border{
+    border: 1px solid black;
+    border-radius: 12px;
+    
+}
+.space { 
+    word-spacing: 30px;
+}
+.spacing { 
+    word-spacing: 65px;
+}
+.padding{
+    padding-top: 12px;
+}
+img {
+  border-radius: 50%;
+}
+button {
+    border-radius: 12px;
+    padding: 10px;
+    margin: 12px 6px;
+}
+.pos{
+  position: relative;
+}

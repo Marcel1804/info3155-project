@@ -117,26 +117,26 @@ def login():
         # .first()
         # or
         user = UserProfile.query.filter_by(username=username).first()
-
+        
         if user is not None and check_password_hash(user.password, password):
             remember_me = False
-
-            if 'remember_me' in request.form and username!="admin" :
+            
+            if 'remember_me' in request.form and username!='admin' :
                 remember_me = True
-
+        
             # If the user is not blank, meaning if a user was actually found,
             # then login the user and create the user session.
             # user should be an instance of your `User` class
             login_user(user, remember=remember_me)
-
-            flash('Logged in successfully.', 'success')
-
-            next_page = request.args.get('next')
-            return redirect(next_page or url_for('profile_page'))
             
-            if  username=="admin":
+            if  username=='admin':
                 flash('Logged in successfully.', 'success')
+                login_user(user)
                 return redirect(url_for('admin'))
+            else:
+                flash('Logged in successfully.', 'success')
+                next_page = request.args.get('next')
+                return render_template('profile_page.html',name=username)
         else:
             flash('Username or Password is incorrect.', 'danger')
 
