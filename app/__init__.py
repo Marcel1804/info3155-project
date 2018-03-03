@@ -15,5 +15,11 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'  # necessary to tell Flask-Login what the default route is for the login page
 login_manager.login_message_category = "info"  # customize the flash message category
 
+SECRET_KEY = 'Sup3r$3cretkey'
+UPLOAD_FOLDER='./app/static/uploads'
+
 app.config.from_object(__name__)
+
+# using a config value
+filefolder=app.config['UPLOAD_FOLDER']
 from app import views

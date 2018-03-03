@@ -6,11 +6,15 @@ This file creates your application.
 """
 
 from app import app, db, login_manager
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, session, abort
 from flask_login import login_user, logout_user, current_user, login_required
 from forms import LoginForm, SignupForm
 from models import UserProfile
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash 
+import os
+from werkzeug.utils import secure_filename
+from forms import UploadForm
+
 
 ###
 # Routing for your application.
@@ -41,11 +45,25 @@ def profile_page():
     """Render a secure page on our website that only logged in users can access."""
     return render_template('profile_page.html')
     
-@app.route('/admin')
+@app.route('/admin', methods=['POST', 'GET'])
 @login_required
 def admin():
     """Render a secure page on our website that only logged in users can access."""
-    return render_template('admin.html')
+    photoform=UploadForm()
+    # Validate file upload on submit
+    if request.method == 'POST'and photoform.validate_on_submit():
+        # Get file data and save to your uploads folder
+        photo= photoform.photo.data #we can also use request.file['photo']
+        description= photoform.description.data
+        
+        filename= secure_filename(photo.filename)
+        photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+        flash('File Saved', 'success')
+        return render_template('admin.html',form=photoform)
+        
+    flash_errors(photoform)
+    return render_template('admin.html',form=photoform)
     
 @app.route('/signup-page',methods=['GET','POST'])
 def signup_page():
@@ -92,8 +110,6 @@ def signup_page():
              
     flash_errors(form)
     return render_template('signup_page.html',form=form)
-
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
